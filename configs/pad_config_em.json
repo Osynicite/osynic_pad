@@ -1,0 +1,19 @@
+{
+    "mapping_mode": "default",
+    "button_mappings": {
+        "LeftTrigger": "Left",      
+        "RightTrigger": "Right",    
+        "LeftTrigger2": "Space",    
+        "RightTrigger2": "Space",   
+        "Start": "Space",          
+        "Select": "Space"          
+    },
+    "alternative_mappings": {
+        "LeftTrigger": "Left",
+        "RightTrigger": "Right",
+        "LeftTrigger2": "Space",
+        "RightTrigger2": "Space",
+        "Start": "Space",
+        "Select": "Space"
+    }
+}

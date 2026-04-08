@@ -1,0 +1,23 @@
+{
+    "mapping_mode": "default",
+    "button_mappings": {
+        "LeftTrigger": "Left",      
+        "RightTrigger": "Right",    
+        "LeftTrigger2": "Left",    
+        "RightTrigger2": "Right",   
+        "Start": "Space",          
+        "Select": "Space",
+        "South": "Enter",
+        "East": "Escape"                                                  
+    },
+    "alternative_mappings": {
+        "LeftTrigger": "Left",
+        "RightTrigger": "Right", 
+        "LeftTrigger2": "Left",
+        "RightTrigger2": "Right",
+        "Start": "Space",
+        "Select": "Space",
+        "South": "Enter",
+        "East": "Escape"
+    }
+}

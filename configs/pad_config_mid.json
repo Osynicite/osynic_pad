@@ -1,0 +1,15 @@
+{
+    "mapping_mode": "default",
+    "button_mappings": {
+        "LeftTrigger2": "Space",      
+        "RightTrigger2": "Space",    
+        "DPadLeft": "Left",    
+        "West": "Right"                                       
+    },
+    "alternative_mappings": {
+        "LeftTrigger2": "Space",
+        "RightTrigger2": "Space", 
+        "DPadLeft": "Left",    
+        "West": "Right"                                       
+    }
+}    
