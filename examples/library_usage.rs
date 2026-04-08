@@ -3,14 +3,14 @@
 
 use std::error::Error;
 use std::sync::Arc;
-use std::time::{ Duration, Instant };
+use std::time::{Duration, Instant};
 
-use tokio::sync::{ mpsc, Mutex };
-use enigo::{ Enigo, Settings };
-use gilrs::{ Gilrs, Event, EventType };
+use enigo::{Enigo, Settings};
+use gilrs::{Event, EventType, Gilrs};
+use tokio::sync::{Mutex, mpsc};
 
 // 导入 osynic_pad 库
-use osynic_pad::{ Config, GamepadMapper, MappingMode, PadEvent, button_to_string, show_gamepads };
+use osynic_pad::{Config, GamepadMapper, MappingMode, PadEvent, button_to_string, show_gamepads};
 
 /// 示例 1: 基础使用 - 直接创建映射器并处理事件
 #[allow(dead_code)]
@@ -26,7 +26,7 @@ async fn example_basic_usage() -> Result<(), Box<dyn Error>> {
         config,
         enigo,
         MappingMode::Default,
-        true // 启用 debug 模式
+        true, // 启用 debug 模式
     );
 
     // 处理事件示例
@@ -176,7 +176,7 @@ async fn example_custom_mapping_mode() -> Result<(), Box<dyn Error>> {
             config.clone(),
             Arc::clone(&enigo),
             MappingMode::Default,
-            false
+            false,
         );
         println!("✓ Default 模式映射器已创建");
         println!(
@@ -191,7 +191,7 @@ async fn example_custom_mapping_mode() -> Result<(), Box<dyn Error>> {
             config.clone(),
             Arc::clone(&enigo),
             MappingMode::Alternative,
-            false
+            false,
         );
         println!("✓ Alternative 模式映射器已创建");
         println!(

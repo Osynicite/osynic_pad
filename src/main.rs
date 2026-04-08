@@ -2,15 +2,15 @@
 // CLI 二进制程序入口
 
 use std::error::Error;
-use std::time::{ Duration, Instant };
 use std::sync::Arc;
+use std::time::{Duration, Instant};
 
-use tokio::sync::{ mpsc, Mutex };
-use enigo::{ Enigo, Settings };
-use gilrs::{ Gilrs, Event, EventType };
+use enigo::{Enigo, Settings};
+use gilrs::{Event, EventType, Gilrs};
+use tokio::sync::{Mutex, mpsc};
 
 // 导入库模块
-use osynic_pad::{ cli, events, Config, GamepadMapper, MappingMode, PadEvent };
+use osynic_pad::{Config, GamepadMapper, MappingMode, PadEvent, cli, events};
 
 #[tokio::main]
 async fn main() {
@@ -45,7 +45,12 @@ async fn run() -> Result<(), Box<dyn Error>> {
     let mode = config.mapping_mode.clone().unwrap_or(MappingMode::Default);
 
     // 创建映射器实例
-    let mapper = Arc::new(GamepadMapper::new(config, Arc::clone(&enigo), mode.clone(), debug));
+    let mapper = Arc::new(GamepadMapper::new(
+        config,
+        Arc::clone(&enigo),
+        mode.clone(),
+        debug,
+    ));
 
     // 创建事件管道
     let (tx, mut rx) = mpsc::channel::<PadEvent>(1000);
@@ -67,33 +72,37 @@ async fn run() -> Result<(), Box<dyn Error>> {
 
         loop {
             // 处理手柄事件
-            while let Some(Event { id: _, event, time: _, .. }) = gilrs.next_event() {
+            while let Some(Event {
+                id: _,
+                event,
+                time: _,
+                ..
+            }) = gilrs.next_event()
+            {
                 match event {
                     EventType::ButtonPressed(button, _) => {
-                        let _ = tx_clone.try_send(
-                            PadEvent::ButtonPress(events::button_to_string(button))
-                        );
+                        let _ = tx_clone
+                            .try_send(PadEvent::ButtonPress(events::button_to_string(button)));
                     }
                     EventType::ButtonReleased(button, _) => {
-                        let _ = tx_clone.try_send(
-                            PadEvent::ButtonRelease(events::button_to_string(button))
-                        );
+                        let _ = tx_clone
+                            .try_send(PadEvent::ButtonRelease(events::button_to_string(button)));
                     }
-                    EventType::AxisChanged(axis, value, _) => {
-                        match axis {
-                            gilrs::Axis::LeftZ => {
-                                let _ = tx_clone.try_send(
-                                    PadEvent::TriggerChanged("LeftTrigger2".to_string(), value)
-                                );
-                            }
-                            gilrs::Axis::RightZ => {
-                                let _ = tx_clone.try_send(
-                                    PadEvent::TriggerChanged("RightTrigger2".to_string(), value)
-                                );
-                            }
-                            _ => {}
+                    EventType::AxisChanged(axis, value, _) => match axis {
+                        gilrs::Axis::LeftZ => {
+                            let _ = tx_clone.try_send(PadEvent::TriggerChanged(
+                                "LeftTrigger2".to_string(),
+                                value,
+                            ));
                         }
-                    }
+                        gilrs::Axis::RightZ => {
+                            let _ = tx_clone.try_send(PadEvent::TriggerChanged(
+                                "RightTrigger2".to_string(),
+                                value,
+                            ));
+                        }
+                        _ => {}
+                    },
                     _ => {}
                 }
             }

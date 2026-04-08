@@ -1,8 +1,8 @@
-use std::error::Error;
-use std::path::PathBuf;
-use std::fs;
-use inquire::{ Select, Confirm, Text };
 use crate::config::scan_config_files;
+use inquire::{Confirm, Select, Text};
+use std::error::Error;
+use std::fs;
+use std::path::PathBuf;
 
 /// 整体配置选择流程
 pub fn show_config_selector() -> Result<(PathBuf, bool), Box<dyn Error>> {
@@ -19,7 +19,11 @@ pub fn show_config_selector() -> Result<(PathBuf, bool), Box<dyn Error>> {
 
 /// 选择配置来源：使用现有配置、导入配置或新建配置
 pub fn choose_config_source() -> Result<PathBuf, Box<dyn Error>> {
-    let options = vec!["📂 使用现有配置", "📥 导入配置（从指定位置）", "✨ 新建配置（交互式）"];
+    let options = vec![
+        "📂 使用现有配置",
+        "📥 导入配置（从指定位置）",
+        "✨ 新建配置（交互式）",
+    ];
 
     let choice = Select::new("请选择配置来源:", options)
         .with_help_message("使用 ↑↓ 导航，Enter 确认")
@@ -101,7 +105,11 @@ fn import_config_from_path() -> Result<PathBuf, Box<dyn Error>> {
     }
 
     fs::copy(&path, &dest_path)?;
-    println!("✅ 已导入配置: {} -> {}", path.display(), dest_path.display());
+    println!(
+        "✅ 已导入配置: {} -> {}",
+        path.display(),
+        dest_path.display()
+    );
 
     Ok(dest_path)
 }
@@ -125,11 +133,10 @@ fn create_new_config() -> Result<PathBuf, Box<dyn Error>> {
 
     // 如果文件已存在
     if config_path.exists() {
-        let should_overwrite = Confirm::new(
-            &format!("配置文件 {} 已存在。是否覆盖?", config_filename)
-        )
-            .with_default(false)
-            .prompt()?;
+        let should_overwrite =
+            Confirm::new(&format!("配置文件 {} 已存在。是否覆盖?", config_filename))
+                .with_default(false)
+                .prompt()?;
 
         if !should_overwrite {
             println!("✅ 使用现有文件: {}", config_path.display());
@@ -138,8 +145,7 @@ fn create_new_config() -> Result<PathBuf, Box<dyn Error>> {
     }
 
     // 创建默认配置
-    let default_config =
-        r#"{
+    let default_config = r#"{
   "default_mode": "Default",
   "mappings": {
     "Default": {
@@ -162,7 +168,7 @@ fn create_new_config() -> Result<PathBuf, Box<dyn Error>> {
 /// 使用 inquire 选择配置文件
 pub fn select_from_list(
     names: Vec<String>,
-    configs: &[PathBuf]
+    configs: &[PathBuf],
 ) -> Result<PathBuf, Box<dyn Error>> {
     let answer = Select::new("请选择配置文件:", names)
         .with_page_size(10)
@@ -172,12 +178,7 @@ pub fn select_from_list(
     // 找到选中的配置文件
     let selected_idx = configs
         .iter()
-        .position(|p| {
-            p
-                .file_name()
-                .and_then(|n| n.to_str())
-                .unwrap_or("") == answer
-        })
+        .position(|p| p.file_name().and_then(|n| n.to_str()).unwrap_or("") == answer)
         .ok_or("Configuration not found")?;
 
     Ok(configs[selected_idx].clone())
@@ -206,7 +207,10 @@ pub fn show_startup_info(config_filename: &str, mode_str: &str, debug: bool) {
     println!("╠═══════════════════════════════════════╣");
     println!("║ 配置文件: {:<26} ║", config_filename);
     println!("║ 映射模式: {:<26} ║", mode_str);
-    println!("║ Debug 模式: {:<24} ║", if debug { "启用 ✓" } else { "关闭" });
+    println!(
+        "║ Debug 模式: {:<24} ║",
+        if debug { "启用 ✓" } else { "关闭" }
+    );
     println!("╚═══════════════════════════════════════╝\n");
 }
 

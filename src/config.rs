@@ -1,9 +1,9 @@
-use serde::{ Deserialize, Serialize };
+use enigo::Key;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::error::Error;
 use std::fs;
 use std::path::PathBuf;
-use enigo::Key;
 
 /// 映射模式：Default 默认模式，Alternative 备选模式
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]

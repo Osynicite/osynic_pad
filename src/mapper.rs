@@ -1,9 +1,12 @@
-use std::sync::{ Arc, LazyLock };
-use tokio::sync::{ Mutex, RwLock };
-use std::error::Error;
-use enigo::{ Direction::{ Press, Release }, Enigo, Key, Keyboard };
-use crate::config::{ Config, MappingMode };
+use crate::config::{Config, MappingMode};
 use crate::events::PadEvent;
+use enigo::{
+    Direction::{Press, Release},
+    Enigo, Key, Keyboard,
+};
+use std::error::Error;
+use std::sync::{Arc, LazyLock};
+use tokio::sync::{Mutex, RwLock};
 
 /// 全局变量：Space 按键计数器，用于防止多个按键同时按下时重复触发
 static SPACE_COUNT: LazyLock<RwLock<u32>> = LazyLock::new(|| RwLock::new(0));
@@ -19,7 +22,12 @@ pub struct GamepadMapper {
 impl GamepadMapper {
     /// 创建新的手柄映射器
     pub fn new(config: Config, enigo: Arc<Mutex<Enigo>>, mode: MappingMode, debug: bool) -> Self {
-        Self { config, enigo, mode, debug }
+        Self {
+            config,
+            enigo,
+            mode,
+            debug,
+        }
     }
 
     /// 处理手柄事件，将其转换为键盘事件

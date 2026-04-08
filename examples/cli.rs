@@ -1,18 +1,21 @@
-use std::error::Error;
-use std::sync::{ Arc, LazyLock };
-use tokio::sync::{ mpsc, RwLock, Mutex };
-use std::time::{ Duration, Instant };
-use std::collections::HashMap;
-use serde::{ Deserialize, Serialize };
-use std::fs;
-use gilrs::{ Gilrs, Button, Event, EventType };
-use enigo::{ Direction::{ Press, Release }, Enigo, Settings, Key, Keyboard };
 use crossterm::{
-    event::{ self, KeyCode, KeyEvent },
+    event::{self, KeyCode, KeyEvent},
     execute,
-    terminal::{ disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen },
+    terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
+use enigo::{
+    Direction::{Press, Release},
+    Enigo, Key, Keyboard, Settings,
+};
+use gilrs::{Button, Event, EventType, Gilrs};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::error::Error;
+use std::fs;
 use std::path::PathBuf;
+use std::sync::{Arc, LazyLock};
+use std::time::{Duration, Instant};
+use tokio::sync::{Mutex, RwLock, mpsc};
 
 // 全局变量：Space 按键计数
 static SPACE_COUNT: LazyLock<RwLock<u32>> = LazyLock::new(|| RwLock::new(0));
@@ -44,42 +47,40 @@ impl Config {
             MappingMode::Alternative => self.alternative_mappings.get(button),
         };
 
-        key_str.and_then(|key_str| {
-            match key_str.as_str() {
-                "Escape" => Some(Key::Escape),
-                "Enter" => Some(Key::Return),
-                "Left" => Some(Key::LeftArrow),
-                "Right" => Some(Key::RightArrow),
-                "Space" => Some(Key::Space),
-                "F2" => Some(Key::F2),
-                "A" => Some(Key::A),
-                "B" => Some(Key::B),
-                "C" => Some(Key::C),
-                "D" => Some(Key::D),
-                "E" => Some(Key::E),
-                "F" => Some(Key::F),
-                "G" => Some(Key::G),
-                "H" => Some(Key::H),
-                "I" => Some(Key::I),
-                "J" => Some(Key::J),
-                "K" => Some(Key::K),
-                "L" => Some(Key::L),
-                "M" => Some(Key::M),
-                "N" => Some(Key::N),
-                "O" => Some(Key::O),
-                "P" => Some(Key::P),
-                "Q" => Some(Key::Q),
-                "R" => Some(Key::R),
-                "S" => Some(Key::S),
-                "T" => Some(Key::T),
-                "U" => Some(Key::U),
-                "V" => Some(Key::V),
-                "W" => Some(Key::W),
-                "X" => Some(Key::X),
-                "Y" => Some(Key::Y),
-                "Z" => Some(Key::Z),
-                _ => None,
-            }
+        key_str.and_then(|key_str| match key_str.as_str() {
+            "Escape" => Some(Key::Escape),
+            "Enter" => Some(Key::Return),
+            "Left" => Some(Key::LeftArrow),
+            "Right" => Some(Key::RightArrow),
+            "Space" => Some(Key::Space),
+            "F2" => Some(Key::F2),
+            "A" => Some(Key::A),
+            "B" => Some(Key::B),
+            "C" => Some(Key::C),
+            "D" => Some(Key::D),
+            "E" => Some(Key::E),
+            "F" => Some(Key::F),
+            "G" => Some(Key::G),
+            "H" => Some(Key::H),
+            "I" => Some(Key::I),
+            "J" => Some(Key::J),
+            "K" => Some(Key::K),
+            "L" => Some(Key::L),
+            "M" => Some(Key::M),
+            "N" => Some(Key::N),
+            "O" => Some(Key::O),
+            "P" => Some(Key::P),
+            "Q" => Some(Key::Q),
+            "R" => Some(Key::R),
+            "S" => Some(Key::S),
+            "T" => Some(Key::T),
+            "U" => Some(Key::U),
+            "V" => Some(Key::V),
+            "W" => Some(Key::W),
+            "X" => Some(Key::X),
+            "Y" => Some(Key::Y),
+            "Z" => Some(Key::Z),
+            _ => None,
         })
     }
 }
@@ -100,7 +101,12 @@ struct GamepadMapper {
 
 impl GamepadMapper {
     fn new(config: Config, enigo: Arc<Mutex<Enigo>>, mode: MappingMode, debug: bool) -> Self {
-        Self { config, enigo, mode, debug }
+        Self {
+            config,
+            enigo,
+            mode,
+            debug,
+        }
     }
 
     async fn handle_event(&self, event: PadEvent) -> Result<(), Box<dyn Error>> {
@@ -382,7 +388,12 @@ async fn run() -> Result<(), Box<dyn Error>> {
 
     let mode = config.mapping_mode.clone().unwrap_or(MappingMode::Default);
 
-    let mapper = Arc::new(GamepadMapper::new(config, Arc::clone(&enigo), mode.clone(), debug));
+    let mapper = Arc::new(GamepadMapper::new(
+        config,
+        Arc::clone(&enigo),
+        mode.clone(),
+        debug,
+    ));
 
     // 创建 channel 传递手柄事件
     let (tx, mut rx) = mpsc::channel::<PadEvent>(1000);
@@ -396,7 +407,10 @@ async fn run() -> Result<(), Box<dyn Error>> {
     println!("╠═══════════════════════════════════════╣");
     println!("║ 配置文件: {:<26} ║", config_filename);
     println!("║ 映射模式: {:<26} ║", format!("{:?}", mode));
-    println!("║ Debug 模式: {:<24} ║", if debug { "启用 ✓" } else { "关闭" });
+    println!(
+        "║ Debug 模式: {:<24} ║",
+        if debug { "启用 ✓" } else { "关闭" }
+    );
     println!("╚═══════════════════════════════════════╝\n");
 
     println!("可用的手柄:");
@@ -435,31 +449,36 @@ async fn run() -> Result<(), Box<dyn Error>> {
                 }
             }
 
-            while let Some(Event { id: _, event, time: _, .. }) = gilrs.next_event() {
+            while let Some(Event {
+                id: _,
+                event,
+                time: _,
+                ..
+            }) = gilrs.next_event()
+            {
                 match event {
                     EventType::ButtonPressed(button, _) => {
                         let _ = tx_clone.try_send(PadEvent::ButtonPress(button_to_string(button)));
                     }
                     EventType::ButtonReleased(button, _) => {
-                        let _ = tx_clone.try_send(
-                            PadEvent::ButtonRelease(button_to_string(button))
-                        );
+                        let _ =
+                            tx_clone.try_send(PadEvent::ButtonRelease(button_to_string(button)));
                     }
-                    EventType::AxisChanged(axis, value, _) => {
-                        match axis {
-                            gilrs::Axis::LeftZ => {
-                                let _ = tx_clone.try_send(
-                                    PadEvent::TriggerChanged("LeftTrigger2".to_string(), value)
-                                );
-                            }
-                            gilrs::Axis::RightZ => {
-                                let _ = tx_clone.try_send(
-                                    PadEvent::TriggerChanged("RightTrigger2".to_string(), value)
-                                );
-                            }
-                            _ => {}
+                    EventType::AxisChanged(axis, value, _) => match axis {
+                        gilrs::Axis::LeftZ => {
+                            let _ = tx_clone.try_send(PadEvent::TriggerChanged(
+                                "LeftTrigger2".to_string(),
+                                value,
+                            ));
                         }
-                    }
+                        gilrs::Axis::RightZ => {
+                            let _ = tx_clone.try_send(PadEvent::TriggerChanged(
+                                "RightTrigger2".to_string(),
+                                value,
+                            ));
+                        }
+                        _ => {}
+                    },
                     _ => {}
                 }
             }
