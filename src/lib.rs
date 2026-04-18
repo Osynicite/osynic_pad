@@ -1,6 +1,6 @@
 // Osynic Pad 库 - 游戏手柄到键盘映射工具
 // 允许外部应用调用核心功能模块
-
+#[cfg(feature = "cli")]
 pub mod cli;
 pub mod config;
 pub mod error;
@@ -8,6 +8,7 @@ pub mod events;
 pub mod mapper;
 
 // 公共 API 导出
+#[cfg(feature = "cli")]
 pub use cli::{
     select_debug_mode, select_from_list, show_config_selector, show_gamepads, show_startup_info,
     show_welcome_screen,
