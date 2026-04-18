@@ -1,3 +1,4 @@
+!#[cfg(feature = "cli")]
 // Osynic Pad - 手柄到键盘映射工具
 // CLI 二进制程序入口
 
